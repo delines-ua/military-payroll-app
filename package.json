@@ -1,0 +1,26 @@
+{
+  "dependencies": {
+    "concurrently": "^9.2.1",
+    "i": "^0.3.7"
+  },
+  "name": "web-finance",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "server": "npm run dev --prefix server",
+    "client": "npm start --prefix client",
+    "dev": "concurrently \"npm run server\" \"npm run client\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/delines-ua/military-payroll-app.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/delines-ua/military-payroll-app/issues"
+  },
+  "homepage": "https://github.com/delines-ua/military-payroll-app#readme",
+  "description": ""
+}

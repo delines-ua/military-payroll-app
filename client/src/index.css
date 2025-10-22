@@ -1,3 +1,4 @@
+/* Зберігаємо попередні стилі, якщо вони були */
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -10,4 +11,39 @@ body {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+/* Додаємо класи для flexbox layout, якщо bootstrap їх не підхопив одразу */
+.min-vh-100 {
+  min-height: 100vh;
+}
+
+.d-flex {
+  display: flex;
+}
+
+.flex-column {
+  flex-direction: column;
+}
+
+.flex-grow-1 {
+  flex-grow: 1;
+}
+
+/* Стилі для футера */
+footer {
+  background-color: #343a40; /* Темний фон, як у хедера */
+  color: rgba(255, 255, 255, 0.55); /* Світлий текст */
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+footer a {
+   color: rgba(255, 255, 255, 0.75); /* Колір посилань */
+   text-decoration: none;
+}
+
+footer a:hover {
+   color: #fff; /* Колір посилань при наведенні */
 }
