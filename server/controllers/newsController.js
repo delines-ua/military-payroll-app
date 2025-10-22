@@ -1,10 +1,10 @@
 const axios = require('axios');
 const { parseStringPromise } = require('xml2js');
 
-// URL RSS-стрічки новин (виправлена)
-const RSS_URL = 'https://armyinform.com.ua/feed/';
+// URL RSS-стрічки новин (ЗАМІНЕНО НА АЛЬТЕРНАТИВНУ)
+const RSS_URL = 'https://www.ukrmilitary.com/feeds/posts/default';
 
-// @desc    Отримати останні новини з сайту АрміяInform
+// @desc    Отримати останні новини
 // @route   GET /api/news
 // @access  Public
 const getMoDNews = async (req, res) => {
@@ -18,43 +18,70 @@ const getMoDNews = async (req, res) => {
 
     // 2. Парсимо XML в JavaScript об'єкт
     console.log('[News] Спроба парсингу XML...');
-    const parsedData = await parseStringPromise(xmlData);
+    // Використовуємо parseStringPromise для xml2js
+    const parsedData = await parseStringPromise(xmlData, { 
+        explicitArray: false, // Спрощуємо структуру об'єкта
+        tagNameProcessors: [key => key.replace(':', '_')] // Замінюємо ':' в тегах, якщо вони є
+    }); 
     console.log('[News] XML розпарсено успішно.');
 
 
-    // 3. Перевіряємо структуру об'єкта
+    // 3. Перевіряємо структуру об'єкта (структура Atom feed відрізняється від RSS)
     let newsItems = [];
-    if (parsedData.rss && parsedData.rss.channel && parsedData.rss.channel[0] && parsedData.rss.channel[0].item) {
-        newsItems = parsedData.rss.channel[0].item;
+    if (parsedData.feed && parsedData.feed.entry) {
+        newsItems = Array.isArray(parsedData.feed.entry) ? parsedData.feed.entry : [parsedData.feed.entry]; // Переконуємось, що це масив
     } else {
-        console.error('[News] Не вдалося знайти елементи новин у RSS-структурі:', JSON.stringify(parsedData, null, 2)); // Виводимо структуру для аналізу
-        throw new Error('Неправильний формат RSS-стрічки');
+        console.error('[News] Не вдалося знайти елементи новин у Atom feed структурі:', JSON.stringify(parsedData, null, 2));
+        throw new Error('Неправильний формат Atom feed');
     }
 
-    // 4. Форматуємо дані
-    const formattedNews = newsItems.slice(0, 10).map(item => ({
-      title: item.title && item.title[0] ? item.title[0] : 'Без заголовка',
-      link: item.link && item.link[0] ? item.link[0] : '#',
-      pubDate: item.pubDate && item.pubDate[0] ? item.pubDate[0] : new Date().toISOString(),
-      description: item.description && item.description[0] ? item.description[0].substring(0, 150) + '...' : 'Опис відсутній',
-    }));
+    // 4. Форматуємо дані (адаптовано для Atom feed)
+    const formattedNews = newsItems.slice(0, 10).map(item => {
+        let description = 'Опис відсутній';
+        // Шукаємо опис в content або summary
+        if (item.summary && typeof item.summary === 'object' && item.summary._) {
+             description = item.summary._;
+        } else if (item.summary && typeof item.summary === 'string') {
+             description = item.summary;
+        } else if (item.content && typeof item.content === 'object' && item.content._) {
+             description = item.content._;
+        } else if (item.content && typeof item.content === 'string') {
+             description = item.content;
+        }
+        // Очищаємо HTML теги та скорочуємо
+        description = description.replace(/<[^>]*>?/gm, '').substring(0, 150) + '...';
+
+        // Link може бути масивом об'єктів
+        let link = '#';
+        if (Array.isArray(item.link)) {
+            const alternateLink = item.link.find(l => l.$.rel === 'alternate');
+            if (alternateLink) link = alternateLink.$.href;
+        } else if (item.link && item.link.$ && item.link.$.href) {
+            link = item.link.$.href;
+        }
+
+        return {
+          title: item.title && typeof item.title === 'object' && item.title._ ? item.title._ : (item.title || 'Без заголовка'),
+          link: link,
+          pubDate: item.published || item.updated || new Date().toISOString(), // Atom використовує published або updated
+          description: description,
+        }
+    });
     console.log(`[News] Успішно відформатовано ${formattedNews.length} новин.`);
 
     res.json(formattedNews);
-  } catch (error) { // <-- Зміни тут, всередині catch
-    let errorMessage = 'Не вдалося завантажити новини. Можливі проблеми з джерелом.'; // Повідомлення за замовчуванням
+  } catch (error) { // Обробка помилок залишається схожою
+    let errorMessage = 'Не вдалося завантажити новини. Можливі проблеми з джерелом.'; 
 
-    // Логуємо більш детальну інформацію про помилку
     if (axios.isAxiosError(error)) {
         console.error(`[News] Помилка Axios при запиті до ${RSS_URL}:`, error.code, error.message);
         if (error.response) {
             console.error('[News] Статус відповіді:', error.response.status);
             console.error('[News] Дані відповіді:', error.response.data);
-            // Можна спробувати взяти повідомлення з відповіді сервера, якщо воно є
             errorMessage = error.response.data?.message || errorMessage;
         } else if (error.request) {
             console.error('[News] Запит було зроблено, але відповіді не отримано:', error.code);
-             if (error.code === 'ETIMEDOUT') {
+             if (error.code === 'ETIMEDOUT' || error.code === 'ECONNABORTED') {
                 errorMessage = 'Сервер новин не відповідає (тайм-аут). Спробуйте пізніше.';
              }
         } else {
@@ -62,13 +89,11 @@ const getMoDNews = async (req, res) => {
         }
     } else if (error instanceof Error) {
          console.error('[News] Помилка парсингу або інша:', error.message);
-         errorMessage = error.message; // Використовуємо повідомлення з помилки
+         errorMessage = error.message; 
     } else {
-         // Обробка несподіваних типів помилок
          console.error('[News] Невідома помилка:', error);
     }
 
-    // Надсилаємо відповідь з помилкою
     res.status(500).json({
         message: errorMessage,
     });
