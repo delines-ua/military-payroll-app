@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { Form, Button, Row, Col, Spinner, Alert, Container } from 'react-bootstrap'; // Додали Container
+import React, { useState, useEffect, useContext, useCallback, ChangeEvent } from 'react';
+import { Form, Button, Row, Col, Spinner, Alert, ListGroup } from 'react-bootstrap'; // Імпортуємо ListGroup, якщо він буде потрібен
 import { AuthContext } from '../context/AuthContext';
 import axios from 'axios';
 
-// Інтерфейс User (тільки потрібні поля для списку)
+// Інтерфейс User (тільки потрібні поля)
 interface User {
   _id: string;
   fullName: string;
@@ -14,34 +14,34 @@ interface User {
 const AdminPayrollPage = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUserId, setSelectedUserId] = useState<string>('');
-  // Замінюємо month, year на paymentDate
-  const [paymentDate, setPaymentDate] = useState<string>('');
+  const [paymentDate, setPaymentDate] = useState<string>(''); // Використовуємо рядок для дати
   const [totalAmount, setTotalAmount] = useState<string>('');
-  const [description, setDescription] = useState<string>(''); // Додаємо поле опису
+  const [description, setDescription] = useState<string>(''); // Додаємо опис
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false); // Загальне завантаження форми
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
-  const [loadingUsers, setLoadingUsers] = useState(true);
+  const [loadingUsers, setLoadingUsers] = useState(true); // Для завантаження списку користувачів
 
   const authContext = useContext(AuthContext);
 
-  // Отримуємо сьогоднішню дату у форматі YYYY-MM-DD для обмеження input[type=date]
-  const today = new Date().toISOString().split('T')[0];
-
+  // Завантажуємо список користувачів для випадаючого списку
   useEffect(() => {
     const fetchUsers = async () => {
+      setLoadingUsers(true);
+      setError(''); // Скидаємо помилку перед запитом
       if (authContext?.userInfo?.token) {
         try {
-          setLoadingUsers(true);
           const config = { headers: { Authorization: `Bearer ${authContext.userInfo.token}` } };
-          // Отримуємо повний список користувачів
-          const { data } = await axios.get<User[]>('/api/users', config);
-          // Фільтруємо на клієнті, залишаючи тільки солдатів
-          setUsers(data.filter(user => user.role === 'soldier'));
-          setError('');
+          const { data } = await axios.get<User[]>(`${process.env.REACT_APP_API_URL}/api/users`, config);
+          // Фільтруємо, залишаючи тільки солдатів (опціонально, можна прибрати filter)
+          setUsers(data.filter(user => user.role !== 'admin'));
+          // Якщо після фільтрації нікого не залишилось
+          if (data.filter(user => user.role !== 'admin').length === 0) {
+              setError('Немає користувачів (роль soldier) для вибору.');
+          }
         } catch (err: any) {
-          setError('Не вдалося завантажити список користувачів.');
+          setError(err.response?.data?.message || 'Не вдалося завантажити список користувачів.');
           console.error("Помилка завантаження користувачів:", err);
         } finally {
           setLoadingUsers(false);
@@ -52,7 +52,7 @@ const AdminPayrollPage = () => {
       }
     };
     fetchUsers();
-  }, [authContext]);
+  }, [authContext?.userInfo?.token]);
 
   const submitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -60,15 +60,24 @@ const AdminPayrollPage = () => {
     setError('');
     setSuccessMessage('');
 
-    if (!selectedUserId || !paymentDate || !totalAmount) {
-      setError('Будь ласка, заповніть поля користувача, дати та суми');
-      setLoading(false);
-      return;
+    // Перевірка, чи обрано дату
+    if (!paymentDate) {
+        setError('Будь ласка, оберіть дату нарахування.');
+        setLoading(false);
+        return;
     }
 
-    // Додаткова перевірка дати (щоб не була в майбутньому)
-    if (new Date(paymentDate) > new Date(today)) {
-        setError('Дата нарахування не може бути у майбутньому.');
+    // Перевірка, чи сума є числом
+    const amountNumber = Number(totalAmount);
+    if (isNaN(amountNumber) || amountNumber < 0) {
+        setError('Будь ласка, введіть коректну суму.');
+        setLoading(false);
+        return;
+    }
+
+
+    if (!selectedUserId || !paymentDate || !totalAmount) {
+        setError('Будь ласка, заповніть усі обов\'язкові поля');
         setLoading(false);
         return;
     }
@@ -77,10 +86,10 @@ const AdminPayrollPage = () => {
     try {
       const config = { headers: { Authorization: `Bearer ${authContext?.userInfo?.token}` } };
       const payslipData = {
-        userId: selectedUserId,
-        paymentDate, // Тепер відправляємо тільки дату
-        totalAmount: Number(totalAmount),
-        description: description, // Додаємо опис
+          userId: selectedUserId,
+          paymentDate,
+          totalAmount: amountNumber, // Надсилаємо число
+          description
       };
 
       await axios.post(`${process.env.REACT_APP_API_URL}/api/payroll`, payslipData, config);
@@ -91,95 +100,93 @@ const AdminPayrollPage = () => {
       setPaymentDate('');
       setTotalAmount('');
       setDescription('');
+       // Ховаємо повідомлення про успіх через 5 секунд
+       setTimeout(() => setSuccessMessage(''), 5000);
 
     } catch (err: any) {
       setError(err.response?.data?.message || 'Помилка створення нарахування.');
       console.error("Помилка створення нарахування:", err);
     } finally {
       setLoading(false);
-      // Ховаємо повідомлення про успіх через 5 секунд
-      setTimeout(() => setSuccessMessage(''), 5000);
     }
   };
 
   return (
-    // Використовуємо Container для кращого центрування на великих екранах
-    <Container>
-      <Row className="justify-content-md-center">
-        <Col xs={12} md={8} lg={6}>
-          <h1>Створити нарахування</h1>
-          {/* Додаємо можливість закрити повідомлення */}
-          {successMessage && <Alert variant="success" onClose={() => setSuccessMessage('')} dismissible>{successMessage}</Alert>}
-          {error && <Alert variant="danger" onClose={() => setError('')} dismissible>{error}</Alert>}
+    <Row className="justify-content-md-center">
+      <Col xs={12} md={8} lg={6}>
+        <h1>Створити нарахування</h1>
+        {/* Повідомлення тепер можна закрити */}
+        {successMessage && <Alert variant="success" onClose={() => setSuccessMessage('')} dismissible>{successMessage}</Alert>}
+        {error && <Alert variant="danger" onClose={() => setError('')} dismissible>{error}</Alert>}
 
-          {loadingUsers ? (
-            <div className="text-center"><Spinner animation="border" /></div>
-          ) : users.length === 0 ? (
-             <Alert variant="info">Немає користувачів для вибору.</Alert>
-          ) : (
-            <Form onSubmit={submitHandler}>
-              <Form.Group controlId="userSelect" className="mt-3">
-                <Form.Label>Оберіть військовослужбовця</Form.Label>
-                <Form.Select
-                  value={selectedUserId}
-                  onChange={(e) => setSelectedUserId(e.target.value)}
-                  required
-                >
-                  <option value="">-- Оберіть користувача --</option>
-                  {users.map((user) => (
-                    <option key={user._id} value={user._id}>
-                      {user.fullName} ({user.email})
-                    </option>
-                  ))}
-                </Form.Select>
-              </Form.Group>
+        <Form onSubmit={submitHandler}>
+          <Form.Group controlId="userSelect" className="mt-3">
+            <Form.Label>Оберіть військовослужбовця</Form.Label>
+            {loadingUsers ? (
+              <Spinner animation="border" size="sm" />
+            ) : users.length === 0 ? (
+                // Показуємо Alert, якщо користувачів немає після завантаження
+                <Alert variant="info">Немає користувачів для вибору.</Alert>
+            ): (
+              <Form.Select
+                value={selectedUserId}
+                onChange={(e) => setSelectedUserId(e.target.value)}
+                required
+                // Робимо неактивним, якщо немає користувачів
+                disabled={users.length === 0}
+              >
+                <option value="">-- Оберіть користувача --</option>
+                {users.map((user) => (
+                  <option key={user._id} value={user._id}>
+                    {user.fullName} ({user.email})
+                  </option>
+                ))}
+              </Form.Select>
+            )}
+          </Form.Group>
 
-              {/* Нове поле для дати */}
-              <Form.Group controlId="paymentDate" className="mt-3">
+           <Form.Group controlId="paymentDate" className="mt-3">
                 <Form.Label>Дата нарахування</Form.Label>
                 <Form.Control
-                  type="date"
-                  value={paymentDate}
-                  onChange={(e) => setPaymentDate(e.target.value)}
-                  required
-                  max={today} // Обмеження на вибір майбутньої дати
+                    type="date"
+                    value={paymentDate}
+                    onChange={(e) => setPaymentDate(e.target.value)}
+                    required
+                    // Обмежуємо вибір майбутніх дат
+                    max={new Date().toISOString().split("T")[0]}
                 />
-              </Form.Group>
+            </Form.Group>
 
-              <Form.Group controlId="totalAmount" className="mt-3">
-                <Form.Label>Загальна сума (грн)</Form.Label>
-                <Form.Control
-                  type="number"
-                  placeholder="Введіть суму"
-                  value={totalAmount}
-                  onChange={(e) => setTotalAmount(e.target.value)}
-                  required
-                  step="0.01"
-                  min="0"
-                />
-              </Form.Group>
+          <Form.Group controlId="totalAmount" className="mt-3">
+            <Form.Label>Загальна сума (грн)</Form.Label>
+            <Form.Control
+              type="number"
+              placeholder="Введіть суму"
+              value={totalAmount}
+              onChange={(e) => setTotalAmount(e.target.value)}
+              required
+              step="0.01" // Дозволяє вводити копійки
+              min="0"
+            />
+          </Form.Group>
 
-              {/* Нове поле для опису */}
-               <Form.Group controlId="description" className="mt-3">
+           <Form.Group controlId="description" className="mt-3">
                 <Form.Label>Опис (необов'язково)</Form.Label>
                 <Form.Control
-                  as="textarea"
-                  rows={2}
-                  placeholder="Додаткова інформація про нарахування"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
+                    as="textarea"
+                    rows={3}
+                    placeholder="Додаткова інформація про нарахування"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
                 />
-              </Form.Group>
+            </Form.Group>
 
-
-              <Button type="submit" variant="primary" className="mt-4 w-100" disabled={loading}>
-                {loading ? <Spinner as="span" animation="border" size="sm" /> : 'Створити нарахування'}
-              </Button>
-            </Form>
-          )}
-        </Col>
-      </Row>
-    </Container>
+          <Button type="submit" variant="primary" className="mt-4 w-100" disabled={loading || loadingUsers || users.length === 0}>
+            {loading ? <Spinner as="span" animation="border" size="sm" /> : 'Створити нарахування'}
+          </Button>
+        </Form>
+      </Col>
+    </Row>
   );
 };
 
