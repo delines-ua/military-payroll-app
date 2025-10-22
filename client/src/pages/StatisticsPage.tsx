@@ -44,7 +44,7 @@ const StatisticsPage = () => {
               Authorization: `Bearer ${authContext.userInfo.token}`,
             },
           };
-          const { data } = await axios.get<PaySlip[]>('/api/payroll/mypayslips', config);
+          const { data } = await axios.get<PaySlip[]>(`${process.env.REACT_APP_API_URL}/api/payroll/mypayslips`, config);
 
           // Обробляємо дані для графіка
           const formattedData = data

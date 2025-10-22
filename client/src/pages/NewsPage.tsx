@@ -19,7 +19,7 @@ const NewsPage = () => {
     const fetchNews = async () => {
       try {
         // Робимо запит на наш backend, який, у свою чергу, візьме новини з МОУ
-        const { data } = await axios.get('/api/news');
+        const { data } = await axios.get(`${process.env.REACT_APP_API_URL}/api/news`);
         setNews(data);
       } catch (err) {
         setError('Не вдалося завантажити новини. Спробуйте пізніше.');

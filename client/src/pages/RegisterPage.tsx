@@ -23,9 +23,9 @@ const RegisterPage = () => {
       };
 
       // Відправляємо всі дані на backend
-      const { data } = await axios.post(
-        '/api/users/register', // Використовуємо proxy
-        { fullName, email, password }, // Додали fullName
+        const { data } = await axios.post(
+        `${process.env.REACT_APP_API_URL}/api/users/register`, 
+        { fullName, email, password },
         config
       );
 

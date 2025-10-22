@@ -20,8 +20,8 @@ const LoginPage = () => {
       };
 
       // Відправляємо email та пароль на наш backend
-      const { data } = await axios.post(
-        'http://localhost:5000/api/users/login',
+        const { data } = await axios.post(
+        `${process.env.REACT_APP_API_URL}/api/users/login`, // <-- Замінено
         { email, password },
         config
       );

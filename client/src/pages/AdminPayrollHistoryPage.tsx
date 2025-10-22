@@ -54,7 +54,7 @@ const AdminPayrollHistoryPage = () => {
       if (authContext?.userInfo?.token) {
         try {
           const config = { headers: { Authorization: `Bearer ${authContext.userInfo.token}` } };
-          const { data } = await axios.get<User[]>('/api/users', config);
+          const { data } = await axios.get<User[]>(`${process.env.REACT_APP_API_URL}/api/users`, config);
           // Можна додати фільтрацію, якщо треба показувати тільки soldier
           setUsers(data);
           setError('');
@@ -81,7 +81,7 @@ const AdminPayrollHistoryPage = () => {
     try {
       const config = { headers: { Authorization: `Bearer ${authContext.userInfo.token}` } };
       // Використовуємо новий маршрут для отримання нарахувань конкретного користувача
-      const { data } = await axios.get<PaySlip[]>(`/api/payroll/user/${userId}`, config);
+      const { data } = await axios.get<PaySlip[]>(`${process.env.REACT_APP_API_URL}/api/payroll/user/${userId}`, config);
       // Сортуємо за датою від новішої до старішої
       setPaySlips(data.sort((a, b) => new Date(b.paymentDate).getTime() - new Date(a.paymentDate).getTime()));
     } catch (err: any) {
@@ -147,7 +147,7 @@ const AdminPayrollHistoryPage = () => {
              throw new Error("Некоректна сума нарахування");
          }
 
-        await axios.put(`/api/payroll/${currentPaySlip._id}`, updateData, config);
+        await axios.put(`${process.env.REACT_APP_API_URL}/api/payroll/${currentPaySlip._id}`, updateData, config);
         setSuccessMessage('Нарахування оновлено!');
         fetchPaySlipsForUser(selectedUserId); // Оновлюємо список саме обраного юзера
         handleCloseEditModal();
@@ -167,7 +167,7 @@ const AdminPayrollHistoryPage = () => {
     if (confirmed) {
       try {
         const config = { headers: { Authorization: `Bearer ${authContext?.userInfo?.token}` } };
-        await axios.delete(`/api/payroll/${id}`, config);
+        await axios.delete(`${process.env.REACT_APP_API_URL}/api/payroll/${id}`, config);
         setSuccessMessage('Нарахування видалено!');
         fetchPaySlipsForUser(selectedUserId); // Оновлюємо список обраного юзера
         setTimeout(() => setSuccessMessage(''), 3000); // Ховаємо повідомлення

@@ -28,7 +28,7 @@ const DashboardPage = () => {
             },
           };
           // Робимо запит на той самий маршрут
-          const { data } = await axios.get<PaySlip[]>('/api/payroll/mypayslips', config); // Очікуємо оновлений тип
+          const { data } = await axios.get<PaySlip[]>(`${process.env.REACT_APP_API_URL}/api/payroll/mypayslips`, config); // Очікуємо оновлений тип
           setPaySlips(data);
           setError(''); // Скидаємо помилку
         } catch (err: any) {

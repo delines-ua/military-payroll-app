@@ -53,7 +53,7 @@ const AdminUserListPage = () => {
     try {
       setLoading(true);
       const config = { headers: { Authorization: `Bearer ${authContext.userInfo.token}` } };
-      const { data } = await axios.get<User[]>('/api/users', config);
+      const { data } = await axios.get<User[]>(`${process.env.REACT_APP_API_URL}/api/users`, config);
       setUsers(data);
       setError('');
     } catch (err: any) {
@@ -120,7 +120,7 @@ const AdminUserListPage = () => {
 
     try {
       if (isEditMode && currentUser._id) {
-        await axios.put(`/api/users/${currentUser._id}`, userData, config);
+        await axios.put(`${process.env.REACT_APP_API_URL}/api/users/${currentUser._id}`, userData, config);
         setSuccessMessage('Дані користувача оновлено!');
       } else {
         if (!userData.password) {
@@ -128,7 +128,7 @@ const AdminUserListPage = () => {
           setLoadingModal(false);
           return;
         }
-        await axios.post('/api/users', userData, config);
+        await axios.post(`${process.env.REACT_APP_API_URL}/api/users`, userData, config);
         setSuccessMessage('Нового користувача створено!');
       }
       fetchUsers();
@@ -146,7 +146,7 @@ const AdminUserListPage = () => {
     if (confirmed) {
       try {
         const config = { headers: { Authorization: `Bearer ${authContext?.userInfo?.token}` } };
-        await axios.delete(`/api/users/${id}`, config);
+        await axios.delete(`${process.env.REACT_APP_API_URL}/api/users/${id}`, config);
         setSuccessMessage('Користувача видалено!');
         fetchUsers();
         setTimeout(() => setSuccessMessage(''), 3000);

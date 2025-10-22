@@ -83,7 +83,7 @@ const AdminPayrollPage = () => {
         description: description, // Додаємо опис
       };
 
-      await axios.post('/api/payroll', payslipData, config);
+      await axios.post(`${process.env.REACT_APP_API_URL}/api/payroll`, payslipData, config);
 
       setSuccessMessage(`Нарахування за ${new Date(paymentDate).toLocaleDateString('uk-UA')} успішно створено!`);
       // Очищаємо форму
