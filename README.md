@@ -14,192 +14,323 @@
 
 Структура проєкту
 
+Опис основних функцій
 
-# Military Payroll App
+Основні труднощі та їх вирішення
 
-Короткий README українською мовою з інструкціями для розробки та розгортання проекту "Military Payroll App" (репозиторій: delines-ua/military-payroll-app).
+Майбутні плани та розвиток проєкту
 
-Короткий опис
----------------
-Це навчальний/курсовий проєкт для автоматизації перегляду та керування нарахуваннями грошового забезпечення військовослужбовців. Проєкт має дві частини: frontend (React + TypeScript) та backend (Node.js + Express) з MongoDB як БД.
+1. Суть проєкту
 
-Швидкий старт (локально)
-----------------------
-1. Встановіть залежності в корені (скрипт керує одночасним запуском):
+Метою даної курсової роботи було створення сучасного веб-додатку для автоматизації процесу перегляду та частково керування грошовим забезпеченням військовослужбовців. Додаток розділено на дві основні частини:
 
-```powershell
-npm install
-```
+Клієнтська частина: Призначена для військовослужбовців. Після автентифікації користувач отримує доступ до особистого кабінету, де може переглянути історію своїх нарахувань та візуалізовану статистику виплат. Також реалізовано доступ до актуальних новин з офіційних джерел.
 
-2. Встановіть залежності для серверної та клієнтської частин (якщо потрібно окремо):
+Адміністративна частина: Призначена для відповідальних осіб (наприклад, бухгалтерів). Надає інструменти для керування обліковими записами користувачів (CRUD) та ручного внесення, редагування й видалення даних про нарахування грошового забезпечення.
 
-```powershell
-npm install --prefix server
-npm install --prefix client
-```
+2. Використані технології та методології
 
-3. Запуск в режимі розробки (одночасно запускає `server` та `client`):
+Проєкт розроблено з використанням сучасного стеку технологій MERN (MongoDB, Express.js, React.js, Node.js) та додаткових інструментів:
 
-```powershell
-npm run dev
-```
+Frontend (Клієнтська частина):
 
-Або запустити окремо:
+Мова: TypeScript
 
-```powershell
-npm run server   ; # запускає `npm run dev` в папці server (nodemon)
-npm run client   ; # запускає react-scripts start в папці client
-```
+```md
+Курсова робота з дисципліни «Веб-технології та веб-дизайн"
 
-Налаштування змінних оточення
------------------------------
-Сервер (в папці `server`) потребує файл `.env` з принаймні такими змінними:
+Тема: Розробка веб-інтерфейсу підсистеми автоматизації нарахування грошового забезпечення військовослужбовців
 
-- MONGO_URI=your_mongodb_connection_string
-- JWT_SECRET=your_jwt_secret
-
-Фронтенд (в папці `client`) може потребувати:
-
-- REACT_APP_API_URL=https://your-backend-url (в development зазвичай http://localhost:5000 або proxy з `client/package.json`)
-
-Команди (вже доступні в `package.json` кореня та підпапок)
-----------------------------------------------------
-- npm run dev — одночасний запуск сервера і клієнта (використовує `concurrently`)
-- npm run server — запускає сервер (використовує `npm run dev --prefix server`)
-- npm run client — запускає клієнт (використовує `npm start --prefix client`)
-- У `server/package.json`: `npm run dev` запускає `nodemon server.js`, `npm start` запускає `node server.js`.
-- У `client/package.json`: `npm start` запускає `react-scripts start`.
-
-Деплой
-------
-Приклади налаштувань (вже використані авторами проєкту):
-
-- Backend: Render — Root Directory: `server`, Build Command: `npm install`, Start Command: `npm start`. Потрібні секрети: `MONGO_URI`, `JWT_SECRET`.
-- Frontend: Vercel — Root Directory: `client`, Framework: Create React App. Налаштуйте змінну `REACT_APP_API_URL` на URL бекенду.
-
-Структура проекту
------------------
-```
-military-payroll-app/
-├─ client/              # Frontend (React + TypeScript)
-│  ├─ public/
-│  └─ src/
-│     ├─ components/    # Header, Footer, AdminRoute і т.д.
-│     ├─ context/       # AuthContext
-│     └─ pages/         # Сторінки: Dashboard, News, Admin тощо
-├─ server/              # Backend (Node.js + Express)
-│  ├─ config/
-│  ├─ controllers/
-│  ├─ middleware/
-│  ├─ models/           # User.js, PaySlip.js
-│  └─ routes/
-├─ .gitignore
-└─ package.json         # Скрипти для одночасного запуску
-```
-
-Короткий опис ключових функцій
------------------------------
-- Аутентифікація: реєстрація та вхід користувачів, JWT токени, bcrypt для паролів.
-- Новини: сервер парсить RSS/Atom (axios + xml2js) і повертає дані для фронтенду.
-- Dashboard: показ особистих нарахувань користувача та статистика (recharts).
-- Адмін-функції: керування користувачами (CRUD), керування нарахуваннями (створення/редагування/видалення).
-
-Поради та відомі проблеми
-------------------------
-- При підключенні до MongoDB Atlas переконайтесь, що Network Access дозволяє підключення (0.0.0.0/0 або конкретний IP), та що `MONGO_URI` правильний.
-- Для локального одночасного запуску клієнта та сервера використовуйте `npm run dev` в корені.
-- Якщо фронтенд не може дістатися бекенду, перевірте `REACT_APP_API_URL` та `proxy` в `client/package.json`.
-
-Контакти / Посилання
--------------------
-- Репозиторій: https://github.com/delines-ua/military-payroll-app
+Виконавець: курсант 221 навчальної групи солдат Науменко О.О.
 
 ---
 
-Якщо потрібно, можу додати більш детальні приклади .env для локального запуску, або автоматичні інструкції деплою для Render/Vercel.
+Зміст
 
-Глобальний стан через AuthContext.
+- Суть проєкту
+- Використані технології та методології
+- Архітектура та Розгортання (Хостинг)
+- Структура проєкту
+- Опис основних функцій
+- Основні труднощі та їх вирішення
+- Майбутні плани та розвиток проєкту
 
-Портал Новин:
+## 1. Суть проєкту
 
-Backend (newsController.js) парсить RSS/Atom (axios, xml2js) з armyinform.com.ua, обходить CORS.
+Метою даної курсової роботи було створення сучасного веб-додатку для автоматизації процесу перегляду та частково керування грошовим забезпеченням військовослужбовців. Додаток розділено на дві основні частини:
 
-Frontend (NewsPage.tsx) запитує /api/news і відображає дані.
+- Клієнтська частина: призначена для військовослужбовців. Після автентифікації користувач отримує доступ до особистого кабінету, де може переглянути історію своїх нарахувань та візуалізовану статистику виплат. Також реалізовано доступ до актуальних новин з офіційних джерел.
+- Адміністративна частина: призначена для відповідальних осіб (наприклад, бухгалтерів). Надає інструменти для керування обліковими записами користувачів (CRUD) та ручного внесення, редагування й видалення даних про нарахування грошового забезпечення.
 
-Особистий кабінет (Дашборд):
+## 2. Використані технології та методології
 
-DashboardPage.tsx робить захищений запит /api/payroll/mypayslips.
+Проєкт розроблено з використанням сучасного стеку технологій MERN (MongoDB, Express.js, React.js, Node.js) та додаткових інструментів:
 
-Backend (payrollController.js) повертає нарахування поточного користувача.
+### Frontend (клієнтська частина)
+- Мова: TypeScript
+- Бібліотека: React.js (v18+)
+- Маршрутизація: react-router-dom (v6+)
+- Управління станом: React Context API (AuthContext)
+- HTTP-клієнт: axios
+- UI-фреймворк: react-bootstrap, bootstrap (v5+)
+- Іконки: Font Awesome
+- Візуалізація даних: recharts
+- Інструменти: jwt-decode
 
-Відображення останніх нарахувань картками.
+### Backend (серверна частина)
+- Платформа: Node.js
+- Фреймворк: Express.js
+- База даних: MongoDB (mongoose)
+- Автентифікація: JWT (jsonwebtoken), хешування паролів (bcryptjs)
+- Обробка XML: xml2js (для RSS/Atom)
+- Інше: dotenv, cors
 
-Статистика:
+### Інструменти розробки
+- concurrently (одночасний запуск)
+- nodemon (авто-перезапуск сервера)
+- Git / GitHub (контроль версій)
 
-StatisticsPage.tsx запитує /api/payroll/mypayslips.
+## 3. Архітектура та Розгортання (Хостинг)
 
-Побудова діаграми динаміки виплат за допомогою recharts.
+Додаток має розділену архітектуру Frontend/Backend і розгорнутий на безкоштовних хмарних платформах.
 
-Адмін-панель:
+```mermaid
+graph TD
+        A[Користувач] --> B{Frontend (React)<br>Vercel};
+        B --> C{Backend (Node.js API)<br>Render};
+        C --> D[(База Даних<br>MongoDB Atlas)];
+        E[Адміністратор] --> B;
+        F[RSS/Atom Feed] --> C;
 
-Користувачі (AdminUserListPage.tsx):
+        style B fill:#f9f,stroke:#333,stroke-width:2px;
+        style C fill:#ccf,stroke:#333,stroke-width:2px;
+        style D fill:#f8d7da,stroke:#333,stroke-width:2px;
+```
 
-Захищений запит /api/users для списку всіх користувачів.
+Деталі розгортання:
 
-CRUD операції через модальне вікно: Створення (POST /api/users), Редагування (PUT /api/users/:id), Видалення (DELETE /api/users/:id).
+- Backend (Render):
+    - Платформа: https://render.com/ (Web Service, Free tier)
+    - Налаштування: Root Directory: server, Build: npm install, Start: npm start
+    - Змінні середовища: MONGO_URI (рядок підключення Atlas), JWT_SECRET.
+    - URL API: https://military-payroll-app.onrender.com (приклад)
 
-Створення Нарахувань (AdminPayrollPage.tsx):
+- Frontend (Vercel):
+    - Платформа: https://vercel.com/
+    - Інтеграція: GitHub Repository
+    - Налаштування: Framework: Create React App, Root Directory: client
+    - Змінні середовища: REACT_APP_API_URL (URL backend на Render).
+    - URL Додатку: https://military-payroll-app.vercel.app (приклад)
 
-Форма з вибором користувача, дати (<input type="date">), суми.
+- База Даних (MongoDB Atlas):
+    - Платформа: https://www.mongodb.com/cloud/atlas (M0 Sandbox, Free)
+    - Доступ: Налаштовано користувача БД та Network Access (0.0.0.0/0).
+    - Керування: Через Atlas UI або MongoDB Compass.
 
-Захищений запит POST /api/payroll.
+## 4. Структура проєкту
 
-Історія Нарахувань (AdminPayrollHistoryPage.tsx):
+```
+military-payroll-app/
+├── client/              # Frontend (React + TypeScript)
+│   ├── public/
+│   └── src/
+│       ├── assets/
+│       ├── components/  # Header, Footer, AdminRoute etc.
+│       ├── context/     # AuthContext
+│       └── pages/       # Компоненти сторінок
+├── server/              # Backend (Node.js + Express)
+│   ├── config/
+│   ├── controllers/
+│   ├── middleware/
+│   ├── models/        # User.js, PaySlip.js
+│   ├── routes/
+│   └── server.js
+├── .gitignore
+└── package.json       # Головний (для concurrently)
+```
 
-Вибір користувача, запит /api/payroll/user/:userId.
+## 5. Опис основних функцій
 
-Таблиця з історією, кнопки для редагування (PUT /api/payroll/:id) та видалення (DELETE /api/payroll/:id) через модальне вікно.
+### Автентифікація та авторизація
 
-6. Основні труднощі та їх вирішення
+Реєстрація/вхід, хешування паролів (bcryptjs). Генерація JWT (jsonwebtoken) з ID та роллю. Зберігання на клієнті (localStorage).
+
+Backend middleware: `protect` (перевірка токена), `admin` (перевірка ролі).
+
+Frontend AdminRoute з `jwt-decode` для захисту адмінських маршрутів.
+
+Глобальний стан через `AuthContext`.
+
+### Портал новин
+
+Backend (`newsController.js`) парсить RSS/Atom (axios, xml2js) з armyinform.com.ua, обходить CORS.
+
+Frontend (`NewsPage.tsx`) запитує `/api/news` і відображає дані.
+
+Короткий приклад компоненту `NewsPage.tsx`:
+
+```tsx
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+
+type NewsItem = { title: string; link: string; pubDate?: string };
+
+export const NewsPage: React.FC = () => {
+    const [items, setItems] = useState<NewsItem[]>([]);
+
+    useEffect(() => {
+        axios.get('/api/news').then(res => setItems(res.data)).catch(err => console.error(err));
+    }, []);
+
+    return (
+        <div>
+            <h2>Новини</h2>
+            <ul>
+                {items.map((it, i) => (
+                    <li key={i}><a href={it.link}>{it.title}</a> {it.pubDate}</li>
+                ))}
+            </ul>
+        </div>
+    );
+};
+```
+
+### Особистий кабінет (Дашборд)
+
+`DashboardPage.tsx` робить захищений запит `/api/payroll/mypayslips`. Backend (`payrollController.js`) повертає нарахування поточного користувача. Відображення останніх нарахувань картками.
+
+Короткий приклад `DashboardPage.tsx`:
+
+```tsx
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+
+type PaySlip = { date: string; amount: number; note?: string };
+
+export const DashboardPage: React.FC = () => {
+    const [payslips, setPayslips] = useState<PaySlip[]>([]);
+
+    useEffect(() => {
+        axios.get('/api/payroll/mypayslips').then(r => setPayslips(r.data)).catch(console.error);
+    }, []);
+
+    return (
+        <div>
+            <h2>Мої нарахування</h2>
+            {payslips.map((p, i) => (
+                <div key={i} className="card mb-2 p-2">
+                    <div>{p.date}</div>
+                    <div>{p.amount} грн</div>
+                </div>
+            ))}
+        </div>
+    );
+};
+```
+
+### Статистика
+
+`StatisticsPage.tsx` запитує `/api/payroll/mypayslips` і будує діаграми з `recharts`.
+
+### Адмін-панель
+
+Користувачі (`AdminUserListPage.tsx`) — захищений запит `/api/users` для списку всіх користувачів. CRUD операції через модальне вікно.
+
+Короткий приклад `AdminUserListPage.tsx` (фрагмент):
+
+```tsx
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+
+type User = { _id: string; name: string; email: string; role: string };
+
+export const AdminUserListPage: React.FC = () => {
+    const [users, setUsers] = useState<User[]>([]);
+
+    useEffect(() => {
+        axios.get('/api/users').then(r => setUsers(r.data)).catch(console.error);
+    }, []);
+
+    return (
+        <div>
+            <h2>Користувачі</h2>
+            <table className="table">
+                <thead><tr><th>Ім'я</th><th>Email</th><th>Роль</th><th></th></tr></thead>
+                <tbody>
+                    {users.map(u => (
+                        <tr key={u._id}>
+                            <td>{u.name}</td>
+                            <td>{u.email}</td>
+                            <td>{u.role}</td>
+                            <td>{/* кнопки редагування/видалення */}</td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        </div>
+    );
+};
+```
+
+### Створення нарахувань (AdminPayrollPage)
+
+Форма з вибором користувача, дати та суми. POST `/api/payroll`.
+
+Фрагмент `AdminPayrollPage.tsx`:
+
+```tsx
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+
+export const AdminPayrollPage: React.FC = () => {
+    const [users, setUsers] = useState<any[]>([]);
+    const [form, setForm] = useState({ userId: '', date: '', amount: 0 });
+
+    useEffect(() => { axios.get('/api/users').then(r => setUsers(r.data)); }, []);
+
+    const submit = () => {
+        axios.post('/api/payroll', form).then(() => alert('OK')).catch(console.error);
+    };
+
+    return (
+        <div>
+            <h2>Створити нарахування</h2>
+            <select value={form.userId} onChange={e => setForm({ ...form, userId: e.target.value })}>
+                <option value="">Виберіть користувача</option>
+                {users.map(u => <option key={u._id} value={u._id}>{u.name}</option>)}
+            </select>
+            <input type="date" value={form.date} onChange={e => setForm({ ...form, date: e.target.value })} />
+            <input type="number" value={form.amount} onChange={e => setForm({ ...form, amount: Number(e.target.value) })} />
+            <button onClick={submit}>Створити</button>
+        </div>
+    );
+};
+```
+
+## 6. Основні труднощі та їх вирішення
 
 Процес розробки супроводжувався низкою типових для веб-розробки викликів:
 
-Деплой та Конфігурація: Проблеми з підключенням до MongoDB Atlas (неправильний пароль, Network Access), налаштування змінних середовища на Render та Vercel.
+- Деплой та Конфігурація: проблеми з підключенням до MongoDB Atlas (неправильний пароль, Network Access), налаштування змінних середовища на Render та Vercel.
 
-Рішення: Уважна перевірка даних доступу, конфігурації MONGO_URI, правил Network Access (0.0.0.0/0), перезапуск сервісів.
+- Взаємодія Frontend/Backend: помилки CORS, ECONNREFUSED через не запущений/впавший backend.
 
-Взаємодія Frontend/Backend: Помилки CORS, ECONNREFUSED через не запущений/впавший backend.
+- Автентифікація/Авторизація: адмінські функції не працювали через старі JWT без поля role.
 
-Рішення: concurrently для локальної розробки; змінна REACT_APP_API_URL для деплою; перевірка логів backend.
+- Зовнішні Залежності (RSS): недоступність або зміна URL RSS-стрічки (404, ETIMEDOUT).
 
-Автентифікація/Авторизація: Адмінські функції не працювали через старі JWT без поля role.
+- React/TypeScript: помилки компіляції та виконання (React.Children.only, типи TSxxxx, ESLint).
 
-Рішення: Оновлення генерації токена на backend; вихід/повторний вхід для оновлення токена на клієнті.
-
-Зовнішні Залежності (RSS): Недоступність або зміна URL RSS-стрічки (404, ETIMEDOUT).
-
-Рішення: Збільшення тайм-ауту axios; пошук та інтеграція альтернативного джерела (Atom Feed), адаптація парсера.
-
-React/TypeScript: Помилки компіляції та виконання (React.Children.only, типи TSxxxx, ESLint).
-
-Рішення: Дебаг, виправлення типів, альтернативні підходи до інтеграції бібліотек (onClick замість LinkContainer), очищення кешу node_modules та браузера.
-
-7. Майбутні плани та розвиток проєкту
+## 7. Майбутні плани та розвиток проєкту
 
 Ця курсова робота є міцним фундаментом для подальшого розвитку, зокрема в рамках дипломної роботи:
 
-Реалізація Калькулятора ГЗ: Додати на Frontend інтерактивний калькулятор.
+- Реалізація Калькулятора ГЗ: додати на Frontend інтерактивний калькулятор.
+- Інтелектуальна автоматизація розрахунків (Диплом): розробка Backend-модуля для аналізу завантажених документів (OCR, Rule Engine).
+- Автоматичне визначення надбавок/пільг та верифікація результатів адміністратором.
+- Розширення Моделей Даних: деталізація нарахувань (оклади, премії, надбавки).
+- Експорт у Excel: додавання функції експорту зведеної відомості.
+- Покращення UI/UX: сортування/фільтрація, пагінація, покращені дашборди.
 
-Інтелектуальна автоматизація розрахунків (Диплом):
 
-Розробка Backend-модуля для аналізу завантажених документів (OCR, Rule Engine).
-
-Автоматичне визначення надбавок/пільг.
-
-Верифікація результатів адміністратором.
-
-Розширення Моделей Даних: Деталізація нарахувань (оклади, премії, надбавки).
-
-Експорт у Excel: Додавання функції експорту зведеної відомості.
-
-Покращення UI/UX: Сортування/фільтрація, пагінація, покращені дешборди.
+```
